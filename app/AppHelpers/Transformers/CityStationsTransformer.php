@@ -1,16 +1,15 @@
 <?php namespace App\AppHelpers\Transformers;
 
 
-class CityTransformer extends Transformer
+class CityStationsTransformer extends Transformer
 {
     public function transform($item)
     {
         return [
             'id' => $item['id'],
-            'name' => $item['name'],
+            'description' => $item['description'],
             'lat' => $item['lat'],
-            'lng' => $item['lng'],
-            'zoom_level' => $item['zoom_level']
+            'lng' => $item['lng']
         ];
     }
 }

@@ -4,14 +4,13 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class City extends Model
+class Station extends Model
 {
     protected $fillable = [
         'id',
-        'name',
+        'description',
         'lat',
         'lng',
-        'zoom_level',
         'created_by',
         'updated_by'
     ];
@@ -23,22 +22,10 @@ class City extends Model
 
 
 
-    public function cityStations()
-    {
-        return $this->hasMany('\App\Station');
-    }
-
-    # Many to many
-    /*public function warehouses()
-    {
-        return $this->belongsToMany('\App\Warehouse', 'article_warehouse');
-    }*/
-
-
     # Search
     public function scopeSearchToken($query, $token)
     {
-        return $query->where('name', 'LIKE', '%'.$token.'%')
+        return $query->where('description', 'LIKE', '%'.$token.'%')
             ->orWhere('lat', 'LIKE', '%'.$token.'%')
             ->orWhere('lng', 'LIKE', '%'.$token.'%');
     }
