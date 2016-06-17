@@ -1,14 +1,14 @@
 <?php namespace App\Http\Controllers\ApiControllers;
 
+use App\AppHelpers\Transformers\Transformer;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\LoginUserRequest;
-use App\ShelfHelpers\Transformers\Transformer;
+use Exception;
 use Faker\Provider\Uuid;
-use Tymon\JWTAuth\Exceptions\JWTException;
 use App\User;
 use Auth;
 use DB;
-use JWTAuth;
+# use JWTAuth;
 use Lang;
 
 
@@ -49,16 +49,32 @@ class UsersController extends BaseApiController {
 
         if(!$user) return $this->respondInternalError();
 
-        $token = JWTAuth::fromUser($user);
+        # $token = JWTAuth::fromUser($user);
 
         return $this->setStatusCode(201)->respond([
             'message' => Lang::get('messages.userCreated'),
-            'token' => $token
+            # 'token' => $token
         ]);
     }
 
 
     public function login(LoginUserRequest $request)
+    {
+        $email = $request->get('email');
+        $password = $request->get('password');
+        $request->only('email', 'password');
+
+        if (Auth::attempt(['email' => $email, 'password' => $password])) {
+            // Authentication passed...
+            return $this->setStatusCode(200)->respond([
+                'token' => $this->getUser()->api_token
+            ]);
+        }
+
+        return $this->setStatusCode(401)->respondWithError(Lang::get('messages.invalidCredentials'));
+    }
+
+    /*public function login(LoginUserRequest $request)
     {
         $email = $request->get('email');
         $password = $request->get('password');
@@ -79,7 +95,7 @@ class UsersController extends BaseApiController {
             'token' => $token
         ]);
 
-    }
+    }*/
 
     public function getAll()
     {

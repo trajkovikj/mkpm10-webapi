@@ -15,4 +15,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('city', 'CityController');
+
+
+Route::group(['prefix' => 'api/v1'], function () {
+
+    Route::post('users', 'UsersController@create');
+    Route::post('users/login', 'UsersController@login');
+
+    Route::group(['middleware' => 'auth:api'], function () {
+
+        Route::resource('cities', 'CityController');
+        Route::resource('stations', 'StationController');
+    });
+
+});
+
+

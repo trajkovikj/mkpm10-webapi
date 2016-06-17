@@ -5,6 +5,7 @@ use App\AppHelpers\Transformers\Transformer;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use DB;
+use Illuminate\Support\Facades\Auth;
 use JWTAuth;
 // use Request;
 
@@ -100,7 +101,8 @@ class BaseApiController extends Controller {
     public function getUser()
     {
         # return Auth User
-        return JWTAuth::parseToken()->authenticate();
+        #return JWTAuth::parseToken()->authenticate();
+        return Auth::guard('api')->user();
     }
 
 }
