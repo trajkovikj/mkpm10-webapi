@@ -6,7 +6,6 @@ use App\AppHelpers\Transformers\CityStationsTransformer;
 use App\AppHelpers\Transformers\CityTransformer;
 use App\AppHelpers\Transformers\Transformer;
 use App\City;
-use App\Http\Controllers\ApiControllers\BaseApiController;
 use App\Http\Requests\CreateCityRequest;
 use App\Http\Requests\UpdateCityRequest;
 use Faker\Provider\Uuid;

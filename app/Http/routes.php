@@ -19,10 +19,15 @@ Route::get('/', function () {
 
 Route::group(['prefix' => 'api/v1'], function () {
 
+    Route::get('users/test', 'UsersController@test');
+
+
     Route::post('users', 'UsersController@create');
     Route::post('users/login', 'UsersController@login');
 
-    Route::group(['middleware' => 'auth:api'], function () {
+    Route::group(['middleware' => ['jwt.auth']], function () {
+
+        Route::get('users/testauth', 'UsersController@testAuth');
 
         Route::resource('cities', 'CityController');
         Route::resource('stations', 'StationController');

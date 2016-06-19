@@ -1,6 +1,5 @@
-<?php namespace App\Http\Controllers\ApiControllers;
+<?php namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\AppHelpers\Transformers\Transformer;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
