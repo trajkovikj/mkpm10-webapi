@@ -12,13 +12,17 @@ class City extends Model
         'lat',
         'lng',
         'zoom_level',
-        'created_by',
-        'updated_by'
+        'north',
+        'south',
+        'east',
+        'west'
+        #'created_by',
+        #'updated_by'
     ];
 
     protected $hidden = [
-        'created_by',
-        'updated_by'
+        #'created_by',
+        #'updated_by'
     ];
 
 

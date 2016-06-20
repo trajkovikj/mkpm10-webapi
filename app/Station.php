@@ -11,13 +11,13 @@ class Station extends Model
         'description',
         'lat',
         'lng',
-        'created_by',
-        'updated_by'
+        #'created_by',
+        #'updated_by'
     ];
 
     protected $hidden = [
-        'created_by',
-        'updated_by'
+        #'created_by',
+        #'updated_by'
     ];
 
 

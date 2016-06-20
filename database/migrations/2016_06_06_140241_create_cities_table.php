@@ -12,9 +12,21 @@ class CreateCitiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('cities', function (Blueprint $table) {
-            $table->increments('id');
+        Schema::create('city', function (Blueprint $table) {
+            $table->string('id', 36);
+            $table->string('name', 30);
+            $table->double('lat');
+            $table->double('lng');
+            $table->integer('zoom_level');
+
+            $table->double('north');
+            $table->double('south');
+            $table->double('east');
+            $table->double('west');
+
             $table->timestamps();
+
+            $table->primary('id');
         });
     }
 
@@ -25,6 +37,6 @@ class CreateCitiesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('cities');
+        Schema::drop('city');
     }
 }
