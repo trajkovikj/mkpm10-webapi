@@ -92,6 +92,8 @@ class BaseApiController extends Controller {
     }
 
 
+
+    
     public function getUserId()
     {
         return $this->getUser()->id;

@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\AppHelpers\Transformers\Transformer;
-use App\Http\Controllers\ApiControllers\BaseApiController;
+use App\Http\Controllers\BaseApiController;
 use App\Http\Requests\CreateStationRequest;
 use App\Http\Requests\EditStationRequest;
 use App\Station;
-use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Lang;
+use Webpatser\Uuid\Uuid;
 
 class StationController extends BaseApiController
 {
@@ -59,12 +59,12 @@ class StationController extends BaseApiController
      */
     public function store(CreateStationRequest $request)
     {
-        $userId = $this->getUserId();
+        # $userId = $this->getUserId();
 
         $additionalInfo = [
             'id' => Uuid::generate(4),
-            'created_by' => $userId,
-            'updated_by' => $userId
+            # 'created_by' => $userId,
+            # 'updated_by' => $userId
         ];
 
         $cleanRequest = $this->removeHiddenFieldsFromRequest($request->all(), new Station());
@@ -116,7 +116,7 @@ class StationController extends BaseApiController
     public function update(EditStationRequest $request, $id)
     {
         $req = $this->removeHiddenFieldsFromRequest($request->all(), new Station());
-        $req = array_merge($req, ['updated_by' => $this->getUserId()]);
+        # $req = array_merge($req, ['updated_by' => $this->getUserId()]);
 
         if(! Station::where('id', '=', $id)->update($req)) $this->respondInternalError();
 

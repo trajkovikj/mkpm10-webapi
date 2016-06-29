@@ -8,6 +8,7 @@ class Station extends Model
 {
     protected $fillable = [
         'id',
+        'city_id',
         'description',
         'lat',
         'lng',
@@ -20,6 +21,8 @@ class Station extends Model
         #'updated_by'
     ];
 
+
+    protected $table = 'station';
 
 
     # Search

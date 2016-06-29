@@ -2,21 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\AppHelpers\GlobalPropertiesFormatter;
 use App\AppHelpers\Transformers\CityStationsTransformer;
 use App\AppHelpers\Transformers\CityTransformer;
 use App\AppHelpers\Transformers\Transformer;
 use App\City;
 use App\Http\Requests\CreateCityRequest;
 use App\Http\Requests\UpdateCityRequest;
-use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Lang;
+use Webpatser\Uuid\Uuid;
+
 
 class CityController extends BaseApiController
 {
+    protected $formatter;
     protected  $cityStationsTransformer;
     public static  $globalLimit = 50;
 
@@ -24,6 +28,7 @@ class CityController extends BaseApiController
     {
         parent::__construct($baseTransformer);
         $this->cityStationsTransformer = $CityStationsTransformer;
+        $this->formatter = new GlobalPropertiesFormatter();
     }
 
     /**
@@ -62,15 +67,17 @@ class CityController extends BaseApiController
      */
     public function store(CreateCityRequest $request)
     {
-        $userId = $this->getUserId();
+        # $userId = $this->getUserId();
 
         $additionalInfo = [
             'id' => Uuid::generate(4),
-            'created_by' => $userId,
-            'updated_by' => $userId
+            #'created_by' => $userId,
+            #'updated_by' => $userId
         ];
+        
 
-        $cleanRequest = $this->removeHiddenFieldsFromRequest($request->all(), new City());
+        $formattedRequestProperties = $this->formatter->formatRequestProperties($request->all());
+        $cleanRequest = $this->removeHiddenFieldsFromRequest($formattedRequestProperties, new City());
         $req = array_merge($cleanRequest, $additionalInfo);
 
         $city = City::create($req);
@@ -93,7 +100,7 @@ class CityController extends BaseApiController
         if(!$city)
             return $this->respondNotFound(Lang::get('messages.cityNotFound'));
 
-        $cityStations = $city->cityStaitons;
+        $cityStations = $city->cityStations;
         $transformedCity = $this->transformer->transform($city);
         $transformedCityStations = $this->cityStationsTransformer->transformCollection($cityStations->all());
         $transformedCity = array_merge($transformedCity, [ 'cityStations' => $transformedCityStations ]);
@@ -123,8 +130,9 @@ class CityController extends BaseApiController
      */
     public function update(UpdateCityRequest $request, $id)
     {
-        $req = $this->removeHiddenFieldsFromRequest($request->all(), new City());
-        $req = array_merge($req, ['updated_by' => $this->getUserId()]);
+        $formattedRequestProperties = $this->formatter->formatRequestProperties($request->all());
+        $req = $this->removeHiddenFieldsFromRequest($formattedRequestProperties, new City());
+        # $req = array_merge($req, ['updated_by' => $this->getUserId()]);
 
         if(! City::where('id', '=', $id)->update($req)) $this->respondInternalError();
 

@@ -1,5 +1,7 @@
 <?php namespace App\AppHelpers\Transformers;
 
+use App\AppHelpers\GlobalPropertiesFormatter;
+
 abstract class Transformer
 {
     public function transformCollection(array $items)

@@ -4,12 +4,13 @@ use App\AppHelpers\Transformers\Transformer;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\LoginUserRequest;
 use Exception;
-use Faker\Provider\Uuid;
 use App\User;
+use Webpatser\Uuid\Uuid;
 use Auth;
 use DB;
 use JWTAuth;
 use Lang;
+
 
 
 class UsersController extends BaseApiController {

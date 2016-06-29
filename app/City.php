@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use DB;
 
 class City extends Model
 {
@@ -26,10 +27,18 @@ class City extends Model
     ];
 
 
+    protected $table = 'city';
+
 
     public function cityStations()
     {
-        return $this->hasMany('\App\Station');
+        $test = $this->hasMany('\App\Station', 'city_id', 'id');
+        $log = DB::getQueryLog();
+        return $this->hasMany('\App\Station', 'city_id', 'id');
+        
+        /*$temp = $this->hasMany('\App\Station', 'city_id', 'id');
+        dd(DB::getQueryLog());
+        return $temp;*/
     }
 
     # Many to many

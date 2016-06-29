@@ -10,13 +10,17 @@ class CityTransformer extends Transformer
             'name' => $item['name'],
             'lat' => $item['lat'],
             'lng' => $item['lng'],
-            'zoom_level' => $item['zoom_level'],
-            'rectangleBounds' => [
+            'zoomLevel' => $item['zoom_level'],
+            'north' => $item['north'],
+            'south' => $item['south'],
+            'east' => $item['east'],
+            'west' => $item['west']
+            /*'rectangleBounds' => [
                 'north' => $item['north'],
                 'south' => $item['south'],
                 'east' => $item['east'],
                 'west' => $item['west'],
-            ]
+            ]*/
         ];
     }
 }
