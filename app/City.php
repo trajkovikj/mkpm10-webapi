@@ -28,6 +28,7 @@ class City extends Model
 
 
     protected $table = 'city';
+    public $incrementing = false;
 
 
     public function cityStations()

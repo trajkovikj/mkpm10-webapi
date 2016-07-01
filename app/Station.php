@@ -23,6 +23,7 @@ class Station extends Model
 
 
     protected $table = 'station';
+    public $incrementing = false;
 
 
     # Search

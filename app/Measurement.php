@@ -21,4 +21,5 @@ class Measurement extends Model
     protected $hidden = [];
 
     protected $table = 'measurement';
+    public $incrementing = false;
 }

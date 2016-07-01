@@ -15,6 +15,7 @@ class StationTransformer extends Transformer
     {
         return [
             'id' => $item['id'],
+            'cityId' => $item['city_id'],
             'description' => $item['description'],
             'lat' => $item['lat'],
             'lng' => $item['lng']

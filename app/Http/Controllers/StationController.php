@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AppHelpers\GlobalPropertiesFormatter;
 use App\AppHelpers\Transformers\Transformer;
 use App\Http\Controllers\BaseApiController;
 use App\Http\Requests\CreateStationRequest;
@@ -16,11 +17,13 @@ use Webpatser\Uuid\Uuid;
 
 class StationController extends BaseApiController
 {
+    protected $formatter;
     public static  $globalLimit = 50;
 
     function __construct(Transformer $baseTransformer)
     {
         parent::__construct($baseTransformer);
+        $this->formatter = new GlobalPropertiesFormatter();
     }
 
     /**
@@ -67,7 +70,8 @@ class StationController extends BaseApiController
             # 'updated_by' => $userId
         ];
 
-        $cleanRequest = $this->removeHiddenFieldsFromRequest($request->all(), new Station());
+        $formattedRequestProperties = $this->formatter->formatRequestProperties($request->all());
+        $cleanRequest = $this->removeHiddenFieldsFromRequest($formattedRequestProperties, new Station());
         $req = array_merge($cleanRequest, $additionalInfo);
 
         $station = Station::create($req);
@@ -115,7 +119,8 @@ class StationController extends BaseApiController
      */
     public function update(EditStationRequest $request, $id)
     {
-        $req = $this->removeHiddenFieldsFromRequest($request->all(), new Station());
+        $formattedRequestProperties = $this->formatter->formatRequestProperties($request->all());
+        $req = $this->removeHiddenFieldsFromRequest($formattedRequestProperties, new Station());
         # $req = array_merge($req, ['updated_by' => $this->getUserId()]);
 
         if(! Station::where('id', '=', $id)->update($req)) $this->respondInternalError();

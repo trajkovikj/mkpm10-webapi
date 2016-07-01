@@ -43,7 +43,7 @@ class CityController extends BaseApiController
         $cities = City::paginate($limit);
 
         return $this->setStatusCode(200)->respondWithPaginator($cities, [
-            'cities' => $this->transformer->transformCollection($cities->all()),
+            'cities' => $this->transformer->transformCollection($cities->all())
         ]);
     }
 

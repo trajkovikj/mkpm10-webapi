@@ -16,11 +16,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('test', 'UsersController@test');
 
 Route::group(['prefix' => 'api/v1'], function () {
-
-    //Route::get('test', 'UsersController@test');
 
     Route::resource('cities', 'CityController');
     Route::resource('stations', 'StationController');
