@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\AppHelpers\Transformers\Transformer;
+use App\Measurement;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Lang;
+
 
 class MeasurementsController extends BaseApiController
 {
@@ -16,6 +20,28 @@ class MeasurementsController extends BaseApiController
         parent::__construct($baseTransformer);
     }
 
+    public function index()
+    {
+        $limit = Input::get('limit') ?: self::$globalLimit;
+        $measurements = Measurement::paginate($limit);
+
+        return $this->setStatusCode(200)->respondWithPaginator($measurements, [
+            'measurements' => $this->transformer->transformCollection($measurements->all()),
+        ]);
+    }
+
+
+    public function show($id)
+    {
+        $measurement = Measurement::find($id);
+
+        if(!$measurement)
+            return $this->respondNotFound(Lang::get('messages.measurementNotFound'));
+
+        return $this->setStatusCode(200)->respond($this->transformer->transform($measurement));
+    }
+    
+    
 
     public function getAllDates()
     {

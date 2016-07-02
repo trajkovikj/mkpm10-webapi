@@ -22,6 +22,9 @@ Route::group(['prefix' => 'api/v1'], function () {
     Route::resource('cities', 'CityController');
     Route::resource('stations', 'StationController');
 
+    Route::get('measurements', 'MeasurementsController@index');
+    Route::get('measurements/{id}', 'MeasurementsController@show');
+
     # Route::post('users', 'UsersController@create');
     # Route::post('users/login', 'UsersController@login');
 

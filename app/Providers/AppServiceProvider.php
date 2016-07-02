@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\AppHelpers\Transformers\CityTransformer;
-use app\AppHelpers\Transformers\MeasurementTransformer;
+use App\AppHelpers\Transformers\MeasurementTransformer;
 use App\AppHelpers\Transformers\NullTransformer;
 use App\AppHelpers\Transformers\StationTransformer;
 use app\AppHelpers\Transformers\UserTransformer;
