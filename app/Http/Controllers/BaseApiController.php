@@ -1,5 +1,7 @@
 <?php namespace App\Http\Controllers;
 
+use App\AppHelpers\QueryCompiler;
+use App\AppHelpers\QueryFactory;
 use App\AppHelpers\Transformers\Transformer;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
@@ -12,11 +14,15 @@ class BaseApiController extends Controller {
 
     protected $statusCode;
     protected $transformer;
+    protected static $queryFactory;
+    protected static $queryCompiler;
 
 
     function __construct(Transformer $baseTransformer)
     {
         $this->transformer = $baseTransformer;
+        self::$queryFactory = new QueryFactory();
+        self::$queryCompiler = new QueryCompiler();
     }
 
 

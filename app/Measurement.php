@@ -22,4 +22,11 @@ class Measurement extends Model
 
     protected $table = 'measurement';
     public $incrementing = false;
+
+    public function scopeSearchFilter($query,array $properties)
+    {
+        foreach($properties as $property)
+            $query = $query->where($property['leftOperand'], $property['operator'], $property['rightOperand']);
+        return $query;
+    }
 }

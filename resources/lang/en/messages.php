@@ -20,4 +20,8 @@ return [
     # Measurements
     'measurementNotFound' => 'The measurement is not found!',
 
+
+    # Common
+    'searchFilterNotProvided' => 'Search filter was not provided!',
+
 ];

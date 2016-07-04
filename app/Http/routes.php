@@ -22,6 +22,11 @@ Route::group(['prefix' => 'api/v1'], function () {
     Route::resource('cities', 'CityController');
     Route::resource('stations', 'StationController');
 
+    
+    Route::post('measurements/filterByCity', 'MeasurementsController@filterByCity');
+    Route::post('measurements/filterByStation', 'MeasurementsController@filterByStation');
+    Route::get('measurements/filter', 'MeasurementsController@filter');
+    Route::get('measurements/allYearsWithMonths', 'MeasurementsController@allYearsWithMonths');
     Route::get('measurements', 'MeasurementsController@index');
     Route::get('measurements/{id}', 'MeasurementsController@show');
 

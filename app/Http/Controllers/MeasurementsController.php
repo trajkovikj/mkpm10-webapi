@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\AppHelpers\Transformers\CustomMeasurementTransformer;
 use App\AppHelpers\Transformers\Transformer;
+use App\Http\Requests\CustomMeasurementsFilterRequest;
 use App\Measurement;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Lang;
 
@@ -14,10 +17,12 @@ use Illuminate\Support\Facades\Lang;
 class MeasurementsController extends BaseApiController
 {
     public static  $globalLimit = 50;
+    protected $customMeasurementTransformer;
 
     function __construct(Transformer $baseTransformer)
     {
         parent::__construct($baseTransformer);
+        $this->customMeasurementTransformer = new CustomMeasurementTransformer();
     }
 
     public function index()
@@ -40,34 +45,159 @@ class MeasurementsController extends BaseApiController
 
         return $this->setStatusCode(200)->respond($this->transformer->transform($measurement));
     }
-    
-    
 
-    public function getAllDates()
+    /**
+     * Show the form for creating a new resource.
+     * Route: GET /measurements/filter?properties=
+     *
+     * @return Response
+     */
+    public function filter()
     {
+        $propertiesQueryParam = Input::get('properties');
+        if(! $propertiesQueryParam) return  $this->setStatusCode(400)->respondWithError(Lang::get('messages.searchFilterNotProvided'));
 
-        /*
-           [
-              {
-                "year" : "2013",
-                "months" : ["Јануари", "Фебруари", "Март", "Април", "Мај", "Јуни", "Јули", "Август", "Септември", "Октомври", "Ноември", "Декември"]
-              },
-              {
-                "year" : "2014",
-                "months" : ["Јануари", "Фебруари", "Март", "Април", "Мај", "Јуни", "Јули", "Август", "Септември", "Октомври", "Ноември", "Декември"]
-              },
-              {
-                "year" : "2015",
-                "months" : ["Јануари", "Фебруари", "Март", "Април", "Мај", "Јуни", "Јули", "Август", "Септември", "Октомври", "Ноември", "Декември"]
-              },
-              {
-                "year" : "2016",
-                "months" : ["Јануари", "Фебруари", "Март", "Април", "Мај"]
-              }
-            ]
-        */
+        $propertiesArray = explode(';', $propertiesQueryParam);
+        $properties = [];
+
+        foreach($propertiesArray as $propertiesArrayItem)
+        {
+            $temp = explode(',',$propertiesArrayItem);
+            if(count($temp) != 3) break;
+
+            $prop = [];
+            $prop['leftOperand'] = $temp[0];
+            $prop['operator'] = $temp[1];
+            $prop['rightOperand'] = $temp[2];
+
+            array_push($properties, $prop);
+        }
+
+        $limit = Input::get('limit') ?: self::$globalLimit;
+
+        $measurements = Measurement::searchFilter($properties)->paginate($limit);
+
+        // if($measurements->total() <= 0) return $this->respondNotFound();
+
+        return $this->setStatusCode(200)->respondWithPaginator($measurements, [
+            'measurements' => $this->transformer->transformCollection($measurements->all()),
+        ]);
+    }
+    
+
+    public function allYearsWithMonths()
+    {
+        # da se popravi da bide zavisno od grad
+        $dbType = config('database.default');
+        $queryKey = 'yearMonthDistinct';
+        $query = parent::$queryFactory->getQuery($dbType,$queryKey);
+
+        $allYearsWithMonths = DB::table('measurement')
+            ->select(DB::raw($query))
+            ->get();
+
+        $responseData = array_map([$this,'dateArrayMap'], $allYearsWithMonths);
+
+        return $this->setStatusCode(200)->respond($responseData);
     }
 
+
+    public function customFilter(CustomMeasurementsFilterRequest $request)
+    {
+        $cityId = $request->input('cityId');
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+
+        $measurements = DB::table('city')
+            ->join('station', 'city.id', '=', 'station.city_id')
+            ->join('measurement', 'station.id', '=', 'measurement.station_id')
+            ->select('measurement.id as id',
+                'city.id as city_id',
+                'station.id as station_id',
+                'measurement.pm10 as pm10',
+                'measurement.date as date')
+            ->where('city.id', '=', $cityId)
+            ->where('date', '>=', $startDate)
+            ->where('date', '<=', $endDate)
+            ->get();
+
+
+
+        return $this->setStatusCode(200)->respond($measurements);
+    }
+    
+    public function filterByCity(CustomMeasurementsFilterRequest $request)
+    {
+        $cityId = $request->input('cityId');
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+        $timeUnit = $request->input('timeUnit');
+
+        $query = $this->getQueryByTimeUnit('city', $timeUnit);
+
+        $results = DB::select($query, [
+            'cityId' => $cityId,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ]);
+
+        //$resultsAsArray = json_decode(json_encode($results), true);
+        return $this->setStatusCode(200)->respond($this->customMeasurementTransformer->transformMeasurementsByCity($results));
+    }
+
+
+    public function filterByStation(CustomMeasurementsFilterRequest $request)
+    {
+        $cityId = $request->input('cityId');
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+        $timeUnit = $request->input('timeUnit');
+
+        $query = $this->getQueryByTimeUnit('station', $timeUnit);
+
+        $results = DB::select($query, [
+            'cityId' => $cityId,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ]);
+
+        return $this->setStatusCode(200)->respond($this->customMeasurementTransformer->transformMeasurementsByStation($results));
+    }
+
+    public function dateArrayMap($dateObject)
+    {
+        return $dateObject->date;
+    }
+
+    private function getQueryByTimeUnit($resource, $timeUnit)
+    {
+        $dbType = config('database.default');
+        $queryKey = '';
+
+        switch ($resource)
+        {
+            case 'city':
+            {
+                $queryKey = $timeUnit === 0
+                    ? 'measurementsByCityByDay'
+                    : 'measurementsByCityByHour';
+                break;
+            }
+            case 'station':
+            {
+                $queryKey = $timeUnit === 0
+                    ? 'measurementsByStationByDay'
+                    : 'measurementsByStationByHour';
+                break;
+            }
+            default:
+            {
+                $queryKey = 'measurementsByCityByDay';
+            }
+        }
+
+        return parent::$queryFactory->getQuery($dbType,$queryKey);
+    }
 
     public function getAvg()
     {
