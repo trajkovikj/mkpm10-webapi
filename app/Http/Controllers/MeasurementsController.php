@@ -131,7 +131,7 @@ class MeasurementsController extends BaseApiController
         $cityId = $request->input('cityId');
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
-        $timeUnit = $request->input('timeUnit');
+        $timeUnit = intval($request->input('timeUnit'));
 
         $query = $this->getQueryByTimeUnit('city', $timeUnit);
 
@@ -151,7 +151,7 @@ class MeasurementsController extends BaseApiController
         $cityId = $request->input('cityId');
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
-        $timeUnit = $request->input('timeUnit');
+        $timeUnit = intval($request->input('timeUnit'));
 
         $query = $this->getQueryByTimeUnit('station', $timeUnit);
 
